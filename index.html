@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Ethereum Transaction</title>
+</head>
+<body>
+    <h1>Ethereum Transaction</h1>
+    <button id="connectWallet">Connect Wallet</button>
+    <button id="sendTransaction" style="display:none;">Send 0.128 ETH</button>
+
+    <script>
+        // تحقق من إذا كان MetaMask مثبتاً
+        if (typeof window.ethereum !== 'undefined') {
+            console.log('MetaMask is installed');
+        } else {
+            alert('Please install MetaMask to interact with this page');
+        }
+
+        let provider;
+        let signer;
+
+        // ربط المحفظة
+        document.getElementById('connectWallet').addEventListener('click', async () => {
+            try {
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                signer = provider.getSigner();
+                console.log('Connected:', await signer.getAddress());
+
+                // عرض زر إرسال المعاملة
+                document.getElementById('sendTransaction').style.display = 'inline-block';
+            } catch (error) {
+                console.error('Connection failed', error);
+                alert('Connection failed. Please try again.');
+            }
+        });
+
+        // إرسال المعاملة
+        document.getElementById('sendTransaction').addEventListener('click', async () => {
+            const tx = {
+                to: "0x..." /* هنا ضع العنوان العشوائي لاختبار المعاملة */,
+                value: ethers.utils.parseEther("0.128"), // إرسال 0.128 ETH
+                gasLimit: 21000,
+                gasPrice: ethers.utils.parseUnits("30", "gwei")
+            };
+
+            try {
+                const transactionResponse = await signer.sendTransaction(tx);
+                console.log('Transaction Sent:', transactionResponse);
+                alert('Transaction Sent!');
+            } catch (error) {
+                console.error('Transaction failed', error);
+                alert('Transaction failed. Please try again.');
+            }
+        });
+    </script>
+
+</body></html>
